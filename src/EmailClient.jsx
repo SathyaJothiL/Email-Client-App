@@ -5,24 +5,27 @@ import EmailLists from './EmailLists'
 
 const EmailClient = () => {
     
-    const [emailStatus,setEmailStatus] = useState({})
-    const [arr,setArr] = useState([])
+    const [emailLists,setEmailLists] = useState([])
     const [body,setBody] = useState(null)
-    const [curr,setCurr] =  useState(null)
+    const [selectedEmail,setSelectedEmail] =  useState(null)
+
+    const [isRead, setIsRead] = useState(new Set())
+    const [isFavourite,setIsFavoruite] = useState(new Set())
+
+    const [activeFilter, setActiveFilter] = useState("All")
 
     useEffect(()=>{
         fetch('https://flipkart-email-mock.vercel.app/')
         .then(response=>response.json())
         .then(data=>{
             console.log(data);
-            setArr(data.list)
+            setEmailLists(data.list)
         })
     },[])
 
-function clicker(id){
-    console.log("button clicked");
-    console.log(id," id clicked");
-    console.log(arr[0].short_description);
+function handleEmailClick(id){
+
+    console.log("email with id ",id," clicked");
     
     fetch(`https://flipkart-email-mock.now.sh/?id=${id}`)
     .then(response=>response.json())
@@ -34,89 +37,64 @@ function clicker(id){
         console.log("Error fetching data");
         setBody("Retry Again")
     })
-    setEmailStatus(prev=>{
-        let o = structuredClone(prev)
-        if(!o[id]){
-            o[id] = {}
-            o[id].isRead = true
-            o[id].isFavourite = false
-            return o
-        }else{
-            return o
-        }
+    setSelectedEmail(id)
+    setIsRead(prev=>{
+        const newPrev = new Set(prev)
+        newPrev.add(id)
+        return newPrev
     })
-    setCurr(id)
 }
 
-function toggleIsFavourite(){
-    
-    setEmailStatus(prev=>{
-        console.log(prev);
-        let o = structuredClone(prev)
-        o[curr].isFavourite = !o[curr].isFavourite
-        // console.log(o[curr].isFavourite);
-        
-        return o
-    })
-    
+function toggleIsFavourite(id){
+    const newIsFavourite = new Set(isFavourite)
+    if(isFavourite.has(id)){
+        newIsFavourite.delete(id)
+    }else{
+        newIsFavourite.add(id)
+    }
+    setIsFavoruite(newIsFavourite)
 }
+
 function filterRead(){
+    setActiveFilter("Read")
+    setSelectedEmail(null)
+   
+}
 
-    let bool = true
-    let newEmailStatus = structuredClone(emailStatus)
-    console.log(newEmailStatus);
-
-    let idList = Object.entries(newEmailStatus).map(([key,value])=>{
-        if(newEmailStatus[key].isRead===bool){
-            console.log(key);
-            
-            return key
-        }
-    })
-    console.log(idList);
-    
-    let filteredRead = arr.filter(item=>idList.includes(item.id))
-    console.log(filteredRead);
-    setCurr(null) 
-    setArr(filteredRead)
-     
+function filterUnread(){
+    setActiveFilter('Unread')
+    setSelectedEmail(null)
 }
 
 function filterFavourite(){
-    let bool = true
-    let newEmailStatus = structuredClone(emailStatus)
-    console.log(newEmailStatus);
-
-    let idList = Object.entries(newEmailStatus).map(([key,value])=>{
-        if(newEmailStatus[key].isFavourite===bool){
-            console.log(key);
-            
-            return key
-        }
-    })
-    console.log(idList);
-    
-    let filteredRead = arr.filter(item=>idList.includes(item.id))
-    console.log(filteredRead);
-     setArr(filteredRead)
-     setCurr(null)
-
+    setActiveFilter("Favourite")
+    setSelectedEmail(null)
+  
 }
 
+function filterAll(){
+    setActiveFilter('All')
+    setSelectedEmail(null)
+}
 
 
   return (
     <div className='m-4 flex flex-col'>
       <div>
-         <Filter filterRead={filterRead} filterFavourite={filterFavourite} />
+         <Filter filterRead={filterRead} filterFavourite={filterFavourite} filterAll={filterAll} filterUnread={filterUnread} />
       </div>
       <div className='flex'>
-      <EmailLists filteredArray={arr} clicker={clicker}/>
+      <EmailLists emailLists={emailLists} handleEmailClick={handleEmailClick} activeFilter={activeFilter} isRead={isRead} isFavourite={isFavourite}/>
+
       {
-        curr===null ? '' : (<EmailBody filteredArray={arr} 
+        selectedEmail===null ? '' : (<EmailBody emailLists={emailLists} 
                         toggleIsFavourite={toggleIsFavourite} 
-                        curr={curr} emailStatus={emailStatus} 
-                        body={body}/>)
+                        selectedEmail={selectedEmail}
+                        body={body}
+                        isFavourite={isFavourite.has(selectedEmail) ? true : false}
+                        name = {emailLists[selectedEmail].from.name}
+                        time = {emailLists[selectedEmail].date}
+                        />)
 
       }
       

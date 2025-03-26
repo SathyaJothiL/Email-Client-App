@@ -1,8 +1,7 @@
 import React from "react";
 import SafeHtmlContent from "./SafeHtmlContent";
 
-const EmailBody = ({emailStatus,curr,body,filteredArray,toggleIsFavourite}) => {
-    console.log(filteredArray);
+const EmailBody = ({name,time,isFavourite,body,selectedEmail,toggleIsFavourite}) => {
  
 
 function timeFormatter(timestamp){
@@ -16,17 +15,17 @@ function timeFormatter(timestamp){
       <div className="innercontent">
         <div className="header p-2">
           <div className="flex justify-between items-center">
-            <p>{filteredArray[curr].from.name}</p>
+            <p>{name}</p>
             <button
-              onClick={() => toggleIsFavourite()}
+              onClick={() => toggleIsFavourite(selectedEmail)}
               className={"p-2 bg-yellow-400 rounded-md"}
             >
-              {emailStatus[curr] && !emailStatus[curr].isFavourite
+              {!isFavourite
                 ? "Mark as Favourite"
                 : "Mark as Unfavourite"}
             </button>
           </div>
-          <div>{timeFormatter(filteredArray[curr].date)}</div>
+          <div>{timeFormatter(time)}</div>
         </div>
         <div className="body">
             {

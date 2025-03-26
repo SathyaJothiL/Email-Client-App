@@ -8,7 +8,7 @@ const Button = ({name})=>{
  )
 }
 
-const Filter = ({filterAll,filterRead, filterFavourite}) => {
+const Filter = ({filterAll,filterRead, filterFavourite,filterUnread}) => {
     const buttonLists = [
         'All','read','Unread','favourite'
     ]
@@ -20,10 +20,10 @@ const Filter = ({filterAll,filterRead, filterFavourite}) => {
         < button onClick={()=>filterRead()} className='px-4 py-1 border-gray-700 border rounder-sm'>
         read
         </button>
-        < button onClick={()=>filterRead()} className='px-4 py-1 border-gray-700 border rounder-sm'>
+        < button onClick={()=>filterUnread()} className='px-4 py-1 border-gray-700 border rounder-sm'>
         Unread
         </button>
-        < button onClick={()=>filterRead()} className='px-4 py-1 border-gray-700 border rounder-sm'>
+        < button onClick={()=>filterFavourite()} className='px-4 py-1 border-gray-700 border rounder-sm'>
         favourite
         </button>
     </div>

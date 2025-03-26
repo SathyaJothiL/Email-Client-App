@@ -1,6 +1,23 @@
 import React from 'react'
 
-const EmailLists = ({filteredArray,clicker}) => {
+const EmailLists = ({emailLists,handleEmailClick,activeFilter,isRead,isFavourite}) => {
+  let filteredArray = emailLists.filter(email=>{
+    if(activeFilter==='All') return email
+    if(activeFilter==='Read') return isRead.has(email.id)
+    if(activeFilter==='Unread') return !isRead.has(email.id)
+    if(activeFilter==='Favourite') return isFavourite.has(email.id)
+  })
+if(activeFilter==='Favourite' && filteredArray.length===0){
+  return(
+    <div>No Favourites Emails</div>
+  )
+}
+if(activeFilter==='Read' && filteredArray.length===0){
+  return(
+    <div>No Read Emails</div>
+  )
+}
+
     let time = []
     filteredArray.forEach(mail=>{
             const date = new Date(mail.date)
@@ -8,12 +25,12 @@ const EmailLists = ({filteredArray,clicker}) => {
             time.push(newDate)
     })
   return (
-    <div className='w-1/3'>
+    <div className='w-full'>
       {
                 filteredArray.map((mail,index)=>{
                     return(
                     <div key={mail.id} className='p-2 border-[#CFD2DC] border-4'>
-                        <button onClick={()=>clicker(mail.id)} className='flex flex-col gap-1 justify-center items-start text-left gap-4'>
+                        <button onClick={()=>handleEmailClick(mail.id)} className='flex flex-col gap-1 justify-center items-start text-left gap-4'>
                                 <p>From : <span>{mail.from.name} &lt;{mail.from.email}&gt;</span></p>
   
                                 <p>Subject : <span>{mail.subject}</span></p>
