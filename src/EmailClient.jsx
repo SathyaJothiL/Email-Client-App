@@ -26,6 +26,7 @@ const EmailClient = () => {
 function handleEmailClick(id){
 
     console.log("email with id ",id," clicked");
+
     
     fetch(`https://flipkart-email-mock.now.sh/?id=${id}`)
     .then(response=>response.json())
@@ -79,12 +80,12 @@ function filterAll(){
 
 
   return (
-    <div className='m-4 flex flex-col'>
+    <div className='m-4 flex flex-col bg-[#F4F5F9]'>
       <div>
-         <Filter filterRead={filterRead} filterFavourite={filterFavourite} filterAll={filterAll} filterUnread={filterUnread} />
+         <Filter filterRead={filterRead} filterFavourite={filterFavourite} filterAll={filterAll} filterUnread={filterUnread} activeFilter = {activeFilter}  />
       </div>
-      <div className='flex'>
-      <EmailLists emailLists={emailLists} handleEmailClick={handleEmailClick} activeFilter={activeFilter} isRead={isRead} isFavourite={isFavourite}/>
+      <div className='flex h-[90vh] overflow-y-auto'>
+      <EmailLists emailLists={emailLists} handleEmailClick={handleEmailClick} activeFilter={activeFilter} isRead={isRead} isFavourite={isFavourite} selectedEmail={selectedEmail}/>
 
       {
         selectedEmail===null ? '' : (<EmailBody emailLists={emailLists} 
@@ -92,8 +93,7 @@ function filterAll(){
                         selectedEmail={selectedEmail}
                         body={body}
                         isFavourite={isFavourite.has(selectedEmail) ? true : false}
-                        name = {emailLists[selectedEmail].from.name}
-                        time = {emailLists[selectedEmail].date}
+                        
                         />)
 
       }

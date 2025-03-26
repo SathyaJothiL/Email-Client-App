@@ -1,45 +1,57 @@
 import React from 'react'
+import Logo from './Logo'
+import { timeFormatter,dateFormatter } from '../timeDate'
 
-const EmailLists = ({emailLists,handleEmailClick,activeFilter,isRead,isFavourite}) => {
+const EmailLists = ({emailLists,handleEmailClick,activeFilter,isRead,isFavourite,selectedEmail}) => {
   let filteredArray = emailLists.filter(email=>{
+
+    if(email.id===selectedEmail){
+      return email
+    }
+
     if(activeFilter==='All') return email
     if(activeFilter==='Read') return isRead.has(email.id)
     if(activeFilter==='Unread') return !isRead.has(email.id)
     if(activeFilter==='Favourite') return isFavourite.has(email.id)
   })
+
 if(activeFilter==='Favourite' && filteredArray.length===0){
   return(
-    <div>No Favourites Emails</div>
+    <div className='mx-8 mt-8 text-xl text-[#636363]'>No Favourites Emails</div>
   )
 }
 if(activeFilter==='Read' && filteredArray.length===0){
   return(
-    <div>No Read Emails</div>
+    <div className='mx-8 mt-8 text-xl text-[#636363]'>No Read Emails</div>
   )
 }
-
-    let time = []
-    filteredArray.forEach(mail=>{
-            const date = new Date(mail.date)
-            let newDate = `${date.getDate().toString().padStart(2,'0')}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getFullYear()}`
-            time.push(newDate)
-    })
+    function capitalizeName(name){
+      let newNameList = name.split(' ').map(word=> word.charAt(0).toUpperCase() + word.slice(1))
+      let newName = newNameList.join(' ')
+      return newName
+    }
   return (
-    <div className='w-full'>
+    <div className='w-full text-[#636363] h-[80vh] overflow-y-auto'>
       {
                 filteredArray.map((mail,index)=>{
                     return(
-                    <div key={mail.id} className='p-2 border-[#CFD2DC] border-4'>
-                        <button onClick={()=>handleEmailClick(mail.id)} className='flex flex-col gap-1 justify-center items-start text-left gap-4'>
-                                <p>From : <span>{mail.from.name} &lt;{mail.from.email}&gt;</span></p>
+                    <div key={mail.id} className={'w-full p-2 border mt-4 flex items-start justify-start gap-2 rounded-xl ' + (selectedEmail===mail.id ? 'border-[#E54065] ' : 'border-[#CFD2DC] ') + (!isRead.has(mail.id) ? 'bg-[#e2e0e0]': 'bg-[#F2F2F2]')}>
+                       <div className='py-4 pl-2'>
+                         <Logo name={mail.from.name} />
+                       </div>
+                        <li onClick={()=>handleEmailClick(mail.id)} className='w-full flex flex-col justify-center items-start text-left gap-4 cursor-pointer px-4 py-4'>
+                                <p>From : <span className='font-bold'>{capitalizeName(mail.from.name)} &lt;{mail.from.email}&gt;</span></p>
   
-                                <p>Subject : <span>{mail.subject}</span></p>
+                                <p>Subject : <span className='font-bold'>{mail.subject}</span></p>
 
                                 <p><span>{mail.short_description}...</span></p>
 
-                                <p>Time : <span>{time[index]}</span></p>
+                                <div className='flex justify-between gap-4 items-center w-full'>
+                                  <p><span className='mr-4'>{dateFormatter(mail.date)}</span><span>{timeFormatter(mail.date)}</span></p>
+                                  <p className='text-[#E54065] font-bold'>{isFavourite.has(mail.id) ? 'Favourite' : ''}</p>
+                                </div>
 
-                        </button>
+                        </li>
                     </div>
                     )
                 })
